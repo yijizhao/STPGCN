@@ -2,10 +2,15 @@
 This is an implementation of [Spatial-Temporal Position-Aware Graph Convolution Networks for Traffic Flow Forecasting (TITS, 2022)](https://ieeexplore.ieee.org/abstract/document/9945663).
 
 ## Requirements
-- mxnet>=1.5.0
+
+**Pytorch version**
+- torch>=2.0
 - easydict
 
-Use ```nvcc -V``` to check the cuda version and install mxnet with the corresponding version. For example, use ```pip install mxnet-cu101``` to install mxnet for cuda version 10.1.
+**Mxnet version**
+- mxnet>=1.5.0
+- easydict
+> Use ```nvcc -V``` to check the cuda version and install mxnet with the corresponding version. For example, use ```pip install mxnet-cu101``` to install mxnet for cuda version 10.1.
 
 ## Data
 - PEMS: Refer to https://github.com/Davidham3/STSGCN
