@@ -1,5 +1,5 @@
 # STPGCN
-This is an implementation of [Spatial-Temporal Position-Aware Graph Convolution Networks for Traffic Flow Forecasting (TITS, 2022)](https://ieeexplore.ieee.org/abstract/document/9945663).
+This is an implementation of [Spatial-Temporal Position-Aware Graph Convolution Networks for Traffic Flow Forecasting (TITS)](https://ieeexplore.ieee.org/abstract/document/9945663).
 
 ## Requirements
 
