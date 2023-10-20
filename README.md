@@ -28,7 +28,7 @@ This is an implementation of [Spatial-Temporal Position-Aware Graph Convolution 
 ## Citing
 If our paper benefits to your research, please cite our paper using the bitex below:
 
-    @article{zhao2023spatial,
+    @article{STPGCN,
         title={Spatial-Temporal Position-Aware Graph Convolution Networks for Traffic Flow Forecasting},
         author={Zhao, Yiji and Lin, Youfang and Wen, Haomin and Wei, Tonglong and Jin, Xiyuan and Wan, Huaiyu},
         journal={IEEE Transactions on Intelligent Transportation Systems},
