@@ -1,6 +1,8 @@
 # STPGCN
 This is an implementation of [Spatial-Temporal Position-Aware Graph Convolution Networks for Traffic Flow Forecasting (TITS)](https://ieeexplore.ieee.org/abstract/document/9945663).
 
+<img src="STPGCN.png" width = "600" alt="" align=center />
+
 ## Requirements
 
 **Mxnet version**
