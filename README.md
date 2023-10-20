@@ -3,14 +3,14 @@ This is an implementation of [Spatial-Temporal Position-Aware Graph Convolution 
 
 ## Requirements
 
-**Pytorch version**
-- torch>=2.0
-- easydict
-
 **Mxnet version**
 - mxnet>=1.5.0
 - easydict
 > Use ```nvcc -V``` to check the cuda version and install mxnet with the corresponding version. For example, use ```pip install mxnet-cu101``` to install mxnet for cuda version 10.1.
+
+**Pytorch version**
+- torch>=2.0
+- easydict
 
 ## Data
 - PEMS: Refer to https://github.com/Davidham3/STSGCN
