@@ -9,7 +9,7 @@ Use ```nvcc -V``` to check the cuda version and install mxnet with the correspon
 
 ## Data
 - PEMS: Refer to https://github.com/Davidham3/STSGCN
-- Metro：Refer to https://github.com/yijizhao/MR-STN/tree/main
+- Metro：Refer to https://github.com/yijizhao/MR-STN
 
 ## Usage
 - python main.py --rid=1 --seed=1 --L=3 --a=4 --b=2 --d=8 --data=PEMS08 --batch=32 --C=64 --workname=STPGCN-PEMS08
