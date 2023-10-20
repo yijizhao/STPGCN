@@ -57,7 +57,7 @@ def masked_mae_np(y_true, y_pred, null_val=np.nan):
     return np.mean(np.nan_to_num(mask * mae))
 
 class Metric(object):
-    """Computes and stores the average and current value,调用时先reset"""
+
     def __init__(self, num_prediction):
         self.time_start = timer()
         self.num_prediction = num_prediction
@@ -235,7 +235,6 @@ class TrafficDataset(gluon.data.Dataset):
         self.T   = config.model.T
         self.V   = config.model.V
         self.ctx = config.model.ctx
-        self.num_recent      = config.data.num_recent
         self.points_per_hour = config.data.points_per_hour
         self.num_prediction  = config.model.num_prediction
         self.data_range = data_range
@@ -282,7 +281,6 @@ class TrafficDataset(gluon.data.Dataset):
                     continue
                 if label_start_idx % (24 * 6) > (24*6) - self.num_prediction:
                     continue
-
             recent = search_recent_data(self.feature, label_start_idx, self.points_per_hour, self.num_prediction)  # recent data
 
             if recent:
@@ -397,8 +395,7 @@ def main(config):
     else:
         model.initialize(ctx=config.model.ctx, init=MyInit(), force_reinit = True)
 
-    if not config.model.DEBUG:
-        model.hybridize()
+    model.hybridize()
 
     loss_function = gluon.loss.L1Loss()
     trainer = gluon.Trainer(model.collect_params(), config.model.optimizer, {'learning_rate':config.model.learning_rate})
@@ -408,13 +405,13 @@ def main(config):
     config.model.logger.write(f"Workspace:{config.model.workname}\nModel:{config.model.name}\n\n")
     config.model.logger.write(f"{'Type':^5}{'Epoch':^5} | {'MAE':^7}{'RMSE':^7}{'MAPE':^7} | Best-Epoch-of-MAE TimeCost\n",is_terminal=False)
 
-    metrics_train = Metric(num_prediction=config.model.num_prediction)
+    metrics_tra = Metric(num_prediction=config.model.num_prediction)
     metrics_val   = Metric(num_prediction=config.model.num_prediction)
-    metrics_test  = Metric(num_prediction=config.model.num_prediction)
+    metrics_tes  = Metric(num_prediction=config.model.num_prediction)
     
     for epoch in range(config.model.start_epochs, config.model.end_epochs):
         # Training
-        train(model, config.data.train_loader, trainer, loss_function, epoch, metrics_train, config=config.model)
+        train(model, config.data.train_loader, trainer, loss_function, epoch, metrics_tra, config=config.model)
         # Validation
         evals(model, config.data.val_loader, epoch, metrics_val, config=config.model, mode='Val')            
         
@@ -423,7 +420,7 @@ def main(config):
                 params_filename = config.PATH_MOD+f"BestVal-{config.rid}_{config.model.name}.params"
                 model.save_parameters(params_filename)
             # Testing
-            evals(model, config.data.test_loader, epoch, metrics_test, config=config.model, mode='Test')
+            evals(model, config.data.test_loader, epoch, metrics_tes, config=config.model, mode='Test')
         else:
             print()
             
@@ -436,11 +433,11 @@ def main(config):
     
     # Final records
     best_val_epoch = metrics_val.best_metrics['epoch']
-    config.model.logger.write(f"Best Validation MAE at Epoch:{best_val_epoch+1:^3} | Corresponding Testing MAE:{metrics_test.step_metrics_epoch['mae'][best_val_epoch][-1]:.2f} RMSE:{metrics_test.step_metrics_epoch['rmse'][best_val_epoch][-1]:.2f} MAPE:{metrics_test.step_metrics_epoch['mape'][best_val_epoch][-1]:.2f}\n",is_terminal=True)
+    config.model.logger.write(f"Best Validation MAE at Epoch:{best_val_epoch+1:^3} | Corresponding Testing MAE:{metrics_tes.step_metrics_epoch['mae'][best_val_epoch][-1]:.2f} RMSE:{metrics_tes.step_metrics_epoch['rmse'][best_val_epoch][-1]:.2f} MAPE:{metrics_tes.step_metrics_epoch['mape'][best_val_epoch][-1]:.2f}\n",is_terminal=True)
     config.model.logger.write(f"{'-'*20}\nMetric,{','.join(['step'+str(i+1) for i in range(config.model.num_prediction)])},Total\n",is_terminal=True)
 
     
-    message_lst = metrics_test.log_lst(epoch=best_val_epoch,sep=',')
+    message_lst = metrics_tes.log_lst(epoch=best_val_epoch,sep=',')
     
     for i,m in enumerate(message_lst):
         if i%6==0: print(('-'*20))
@@ -451,7 +448,7 @@ def main(config):
             f.write(f"{config.rid},{m}\n")
         f.close()
 
-    return metrics_val,metrics_test
+    return metrics_val,metrics_tes
 
 
 def default_config(data='PEMS08',workname='record'):
@@ -469,7 +466,6 @@ def default_config(data='PEMS08',workname='record'):
 
     config.data.feature_file = config.data.path+config.data.name+'/flow.npy'
     config.data.spatial = config.data.path+config.data.name+'/adj.npy'
-    config.data.num_recent  = 1
 
     if config.data.name=='MetroHZ': 
         config.data.num_features    = 2
@@ -530,9 +526,8 @@ def default_config(data='PEMS08',workname='record'):
         
     config.model.num_prediction  = 12    
     config.model.V = config.data.num_vertices
-    config.model.T = config.model.num_prediction*config.data.num_recent
+    config.model.T = config.model.num_prediction
     config.model.num_features = config.data.num_features
-    config.model.week_len = 7
     config.model.day_len = config.data.points_per_hour * 24
     
     
@@ -548,7 +543,7 @@ def default_config(data='PEMS08',workname='record'):
     return config
 
 def str_config(config):
-    str_cfg = (f"Data:{config.data.name} Spatio-Temporal Range:a{config.model.alpha}b{config.model.beta} Recent:{config.data.num_recent} History:{config.model.T} Predict:{config.model.num_prediction} Batch:{config.model.batch_size} lr:{config.model.learning_rate}\n"
+    str_cfg = (f"Data:{config.data.name} Spatio-Temporal Range:a{config.model.alpha}b{config.model.beta} History:{config.model.T} Predict:{config.model.num_prediction} Batch:{config.model.batch_size} lr:{config.model.learning_rate}\n"
                f"Layer:{config.model.L} Dim:{config.model.C} Random Seed:{config.seed}  Dim of embedding:{config.model.d}"
                )
     return str_cfg
@@ -618,7 +613,6 @@ if __name__ == "__main__":
     parser.add_argument("--max_epoch",  type=int, default=200)
     parser.add_argument("--early_stop", type=int, default=150)
     parser.add_argument("--workname",   type=str, default='STPGCN')
-    parser.add_argument("--DEBUG",      type=int, default=0)
 
     args = parser.parse_args()
 
