@@ -11,6 +11,7 @@ This is an implementation of [Spatial-Temporal Position-Aware Graph Convolution 
 **Pytorch version**
 - torch>=2.0
 - easydict
+> Thanks to Dr. Wen for the [pytorch version](https://github.com/wenhaomin/STPGCN_pytorch/).
 
 ## Data
 - PEMS: Refer to https://github.com/Davidham3/STSGCN
